@@ -1,3 +1,4 @@
+const moment = require('moment-timezone');
 const logger = require("../core/logger/logger");
 const {
   notifyAllSubscribers,
@@ -33,6 +34,7 @@ let monitoringState = {
  */
 const startMonitoringService = () => {
   try {
+
     // Schedule a job
     const MINUTES = process.env.CHECK_INTERVAL_MINUTES || 15;
     const job = scheduleJobMinutes(MINUTES, async () => {
