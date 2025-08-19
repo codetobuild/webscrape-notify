@@ -32,7 +32,7 @@ class TimeAwareMonitoringService {
     }
 
     logger.info(
-      "🕐 Initializing Time-Aware Monitoring Service (11 AM - 11 PM IST)"
+      "🕐 Initializing Time-Aware Monitoring Service (11 AM - 10 PM IST)"
     );
 
     // Check current time and start/stop monitoring accordingly
@@ -54,7 +54,7 @@ class TimeAwareMonitoringService {
     const currentTime = moment().tz(process.env.TIME_ZONE);
     const currentHour = currentTime.hour();
     const isSunday = currentTime.day() === 0;
-    const shouldBeActive = !isSunday && currentHour >= 11 && currentHour < 23;
+    const shouldBeActive = !isSunday && currentHour >= 11 && currentHour < 22;
 
     const monitoringState = getMonitoringState();
     const isCurrentlyRunning = monitoringState.isRunning;
@@ -67,6 +67,15 @@ class TimeAwareMonitoringService {
           "HH:mm:ss"
         )} IST`
       );
+      const timeInfo = {
+      date: currentTime.format("DD"),
+      time: currentTime.format("HH:mm:ss"),
+      day: currentTime.format("dddd"),
+      month: currentTime.format("MMMM"),
+      year: currentTime.format("YYYY"),
+      fullDateTime: currentTime.format("dddd, MMMM DD, YYYY HH:mm:ss"),
+    };
+    console.log(timeInfo);
       startMonitoringService();
       this.lastActiveState = true;
     } else if (!shouldBeActive && isCurrentlyRunning) {
