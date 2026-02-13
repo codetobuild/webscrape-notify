@@ -1,5 +1,7 @@
 const winston = require("winston");
 const moment = require("moment-timezone");
+const fs = require("fs");
+const path = require("path");
 
 const logLevels = {
   error: 0,
@@ -17,6 +19,25 @@ const getLogLevel = () => {
   const isDevelopment = env === "development";
   return isDevelopment ? "debug" : "info";
 };
+
+const isVercel = Boolean(process.env.VERCEL);
+const logDir = isVercel ? "/tmp/logs" : path.join(process.cwd(), "logs");
+
+let fileTransports = [];
+try {
+  fs.mkdirSync(logDir, { recursive: true });
+  fileTransports = [
+    new winston.transports.File({
+      filename: path.join(logDir, "error.log"),
+      level: "error",
+    }),
+    new winston.transports.File({
+      filename: path.join(logDir, "combined.log"),
+    }),
+  ];
+} catch (err) {
+  // If filesystem is read-only, continue with console-only logging.
+}
 
 // Configure winston logger
 const logger = winston.createLogger({
@@ -44,10 +65,7 @@ const logger = winston.createLogger({
         )
       ),
     }),
-    // Write all errors to error.log
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    // Write all logs to combined.log
-    new winston.transports.File({ filename: "logs/combined.log" }),
+    ...fileTransports,
   ],
 });
 
