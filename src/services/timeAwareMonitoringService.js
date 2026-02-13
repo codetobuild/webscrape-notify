@@ -1,7 +1,14 @@
-const moment = require('moment-timezone');
-const logger = require('../core/logger/logger');
-const { startMonitoringService, stopMonitoringService, getMonitoringState } = require('./monitoringService');
-const { scheduleJobMinutes } = require('../core/schedule/schedule');
+const moment = require("moment-timezone");
+const logger = require("../core/logger/logger");
+const {
+  startMonitoringService,
+  stopMonitoringService,
+  getMonitoringState,
+} = require("./monitoringService");
+const { scheduleJobMinutes } = require("../core/schedule/schedule");
+
+const getTimeZone = () =>
+  process.env.TIME_ZONE || process.env.INDIAN_TIME_ZONE || "Asia/Kolkata";
 
 class TimeAwareMonitoringService {
   constructor() {
@@ -14,7 +21,7 @@ class TimeAwareMonitoringService {
    * Initialize the time-aware monitoring service
    */
   initialize() {
-    const currentTime = moment().tz(process.env.TIME_ZONE);
+    const currentTime = moment().tz(getTimeZone());
 
     const timeInfo = {
       date: currentTime.format("DD"),
@@ -51,7 +58,7 @@ class TimeAwareMonitoringService {
    * Check current IST time and start/stop monitoring service accordingly
    */
   checkAndUpdateMonitoringState() {
-    const currentTime = moment().tz(process.env.TIME_ZONE);
+    const currentTime = moment().tz(getTimeZone());
     const currentHour = currentTime.hour();
     const isSunday = currentTime.day() === 0;
     const shouldBeActive = !isSunday && currentHour >= 11 && currentHour < 22;
@@ -68,14 +75,14 @@ class TimeAwareMonitoringService {
         )} IST`
       );
       const timeInfo = {
-      date: currentTime.format("DD"),
-      time: currentTime.format("HH:mm:ss"),
-      day: currentTime.format("dddd"),
-      month: currentTime.format("MMMM"),
-      year: currentTime.format("YYYY"),
-      fullDateTime: currentTime.format("dddd, MMMM DD, YYYY HH:mm:ss"),
-    };
-    console.log(timeInfo);
+        date: currentTime.format("DD"),
+        time: currentTime.format("HH:mm:ss"),
+        day: currentTime.format("dddd"),
+        month: currentTime.format("MMMM"),
+        year: currentTime.format("YYYY"),
+        fullDateTime: currentTime.format("dddd, MMMM DD, YYYY HH:mm:ss"),
+      };
+      console.log(timeInfo);
       startMonitoringService();
       this.lastActiveState = true;
     } else if (!shouldBeActive && isCurrentlyRunning) {
@@ -110,7 +117,7 @@ class TimeAwareMonitoringService {
    * Get the current status of time-aware monitoring
    */
   getStatus() {
-    const currentTime = moment().tz(process.env.TIME_ZONE);
+    const currentTime = moment().tz(getTimeZone());
     const currentHour = currentTime.hour();
     const shouldBeActive = currentHour >= 11 && currentHour < 23;
     const monitoringState = getMonitoringState();
@@ -180,5 +187,5 @@ const timeAwareMonitoringService = new TimeAwareMonitoringService();
 
 module.exports = {
   timeAwareMonitoringService,
-  TimeAwareMonitoringService
+  TimeAwareMonitoringService,
 };

@@ -91,17 +91,17 @@ const performCheck = async (isManual = false) => {
     monitoringState.checks.total++;
 
     // Fetch and parse RESULT webpage
-    // const resultData = await extractWebPageData(
-    //   "RESULT",
-    //   process.env.RESULT_PAGE_URL
-    // );
+    const resultData = await extractWebPageData(
+      "RESULT",
+      process.env.RESULT_PAGE_URL
+    );
     // Fetch and parse HOME webpage
     const homeData = await extractWebPageData(
       "HOME",
       process.env.HOME_PAGE_URL
     );
     // Combine both page data
-    const resultData = [];
+    // const resultData = [];
 
     const pageTableData = [...resultData, ...homeData];
 
